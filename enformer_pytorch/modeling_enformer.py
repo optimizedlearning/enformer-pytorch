@@ -448,4 +448,7 @@ class Enformer(PreTrainedModel):
             return out, x
 
         return out
+<<<<<<< HEAD
+>>>>>>> parent of 865050a... Enformer can now return many outputs simultaneously via dict
+=======
 >>>>>>> parent of 865050a... Enformer can now return many outputs simultaneously via dict
