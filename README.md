@@ -7,7 +7,7 @@ Implementation of <a href="https://deepmind.com/blog/article/enformer">Enformer<
 ## Install
 
 ```bash
-$ pip install enformer-pytorch
+$ pip install git+https://github.com/optimizedlearning/enformer-pytorch.git
 ```
 
 ## Usage
