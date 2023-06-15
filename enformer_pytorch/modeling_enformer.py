@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-=======
 import math
 import torch
 from torch import nn, einsum
@@ -8,11 +6,12 @@ from torch.utils.checkpoint import checkpoint_sequential
 
 from einops import rearrange, reduce
 from einops.layers.torch import Rearrange
-
-from enformer_pytorch.data import str_to_one_hot, seq_indices_to_one_hot
-
-from enformer_pytorch.config_enformer import EnformerConfig
-
+if __name__ !="__main__":
+    from enformer_pytorch.data import str_to_one_hot, seq_indices_to_one_hot
+    from enformer_pytorch.config_enformer import EnformerConfig
+else:
+    from data import str_to_one_hot, seq_indices_to_one_hot
+    from config_enformer import EnformerConfig
 from transformers import PreTrainedModel
 
 # constants
@@ -195,7 +194,7 @@ def ConvBlock(dim, dim_out = None, kernel_size = 1):
         nn.Conv1d(dim, default(dim_out, dim), kernel_size, padding = kernel_size // 2)
     )
 
-# attention classes
+
 
 class Attention(nn.Module):
     def __init__(
@@ -263,6 +262,12 @@ class Attention(nn.Module):
         out = rearrange(out, 'b h n d -> b n (h d)')
         return self.to_out(out)
 
+class EnformerOutput():
+	#I keep getting tab errors and I don't know why. This is a desparate attempt to resolve that
+	def __init__(self,loss,corr_coef,y_hat):
+		self.loss=loss
+		self.corr_coef=corr_coef
+		self.y_hat=y_hat
 # main class
 
 class Enformer(PreTrainedModel):
@@ -435,20 +440,17 @@ class Enformer(PreTrainedModel):
         if exists(head):
             assert head in self._heads, f'head {head} not found'
             out = out[head]
-
+        returndict = {}
+        
         if exists(target):
             assert exists(head), 'head must be passed in if one were to calculate loss directly with targets'
 
             if return_corr_coef:
-                return pearson_corr_coef(out, target)
+                returndict['corr_coef'] = pearson_corr_coef(out, target)
 
-            return poisson_loss(out, target)
+            returndict['loss'] = poisson_loss(out, target)
 
         if return_embeddings:
-            return out, x
+            returndict['embeddings'] = x
 
-        return out
-<<<<<<< HEAD
->>>>>>> parent of 865050a... Enformer can now return many outputs simultaneously via dict
-=======
->>>>>>> parent of 865050a... Enformer can now return many outputs simultaneously via dict
+        return returndict
