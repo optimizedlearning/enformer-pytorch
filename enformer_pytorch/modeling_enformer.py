@@ -43,6 +43,7 @@ def log(t, eps = 1e-20):
 # losses and metrics
 
 def poisson_loss(pred, target):
+
     return (pred - target * log(pred)).mean()
 
 def pearson_corr_coef(x, y, dim = 1, reduce_dims = (-1,)):
@@ -280,7 +281,8 @@ class Enformer(PreTrainedModel):
 
     def __init__(self, config):
         super().__init__(config)
-        self.dim = config.dim
+        self.loss = torch.nn.PoissonNLLLoss(log_input=False)
+	self.dim = config.dim
         half_dim = config.dim // 2
         twice_dim = config.dim * 2
 
@@ -448,7 +450,7 @@ class Enformer(PreTrainedModel):
             if return_corr_coef:
                 returndict['corr_coef'] = pearson_corr_coef(out, target)
 
-            returndict['loss'] = poisson_loss(out, target)
+            returndict['loss'] = self.loss(out, target)
 
         if return_embeddings:
             returndict['embeddings'] = x
